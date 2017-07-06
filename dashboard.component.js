@@ -67,55 +67,39 @@ window.dashboardComponent = Vue.extend({
     `,
     data: function () {
         return {
-            title: "Início"
+            title: "Início",
+            resume: {
+                pays: {
+                    done: 0,
+                    pending: 0,
+                    total: 0
+                },
+                receives: {
+                    done: 0,
+                    pending: 0,
+                    total: 0
+                }
+            }
         };
     },
-    computed: {
-        resume: function () {
-            return {
-                pays: this.getPayBillsResume(),
-                receives: this.getReceiveBillsResume()
-            };
-        }
+    created: function () {
+        this.getPayBillsResume();
+        this.getReceiveBillsResume();
     },
     methods: {
         getPayBillsResume: function () {
-            var bills = this.$root.$children[0].payBills;
-            var resume = {
-                done: 0,
-                pending: 0,
-                total: 0
-            };
+            var self = this;
 
-            for (var i in bills) {
-                if (bills[i].done)
-                    resume.done += bills[i].value;
-                else
-                    resume.pending += bills[i].value;
-
-                resume.total += bills[i].value;
-            }
-
-            return resume;
+            Bill.resume().then(function (response) {
+                self.resume.pays = response.data.resume;
+            });
         },
         getReceiveBillsResume: function () {
-            var bills = this.$root.$children[0].receiveBills;
-            var resume = {
-                done: 0,
-                pending: 0,
-                total: 0
-            };
+            var self = this;
 
-            for (var i in bills) {
-                if (bills[i].done)
-                    resume.done += bills[i].value;
-                else
-                    resume.pending += bills[i].value;
-
-                resume.total += bills[i].value;
-            }
-
-            return resume;
+            BillReceive.resume().then(function (response) {
+                self.resume.receives = response.data.resume;
+            });
         }
     }
 });

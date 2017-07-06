@@ -13,7 +13,7 @@ window.billReceiveListComponent = Vue.extend({
         </thead>
         <tbody>
         <tr v-for="(index, o) in bills">
-            <td>{{ index + 1 }}</td>
+            <td>{{ o.id }}</td>
             <td>{{ o.date_due }}</td>
             <td>{{ o.name }}</td>
             <td>{{ o.value | currency 'R$ ' 2 }}</td>
@@ -21,7 +21,7 @@ window.billReceiveListComponent = Vue.extend({
                 {{ o.done | billReceiveLabel }}
             </td>
             <td>
-                <a v-link="{name: 'bill-receive.update', params: {index: index} }" class="btn btn-default btn-sm">Editar</a>
+                <a v-link="{name: 'bill-receive.update', params: {id: o.id} }" class="btn btn-default btn-sm">Editar</a>
                 <a href="#" @click.prevent="deleteBill(o)" class="btn btn-default btn-sm">Excluir</a>
             </td>
         </tr>
@@ -30,13 +30,25 @@ window.billReceiveListComponent = Vue.extend({
     `,
     data: function () {
         return {
-            bills: this.$root.$children[0].receiveBills
+            bills: []
         };
+    },
+    created: function () {
+        var self = this;
+
+        BillReceive.query().then(function (response) {
+            self.bills = response.data;
+        });
     },
     methods: {
         deleteBill: function (bill) {
             if (confirm('Deseja realmente exlcuir?')) {
-                this.$root.$children[0].receiveBills.$remove(bill);
+                var self = this;
+
+                BillReceive.delete({id: bill.id}).then(function (response) {
+                    self.bills.$remove(bill);
+                    self.$dispatch('change-info');
+                });
             }
         }
     }
