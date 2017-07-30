@@ -19,23 +19,23 @@ window.billReceiveComponent = Vue.extend({
     
     <router-view></router-view>
     `,
-    data: function () {
+    data() {
         return {
             title: "Contas a receber",
             status: false
         };
     },
-    created: function () {
+    created() {
         this.updateStatus();
     },
     methods: {
-        calculateStatus: function (bills) {
+        calculateStatus(bills) {
             if (!bills.length)
                 this.status = false;
 
-            var count = 0;
+            let count = 0;
 
-            for (var i in bills) {
+            for (let i in bills) {
                 if (!bills[i].done) {
                     count++;
                 }
@@ -43,16 +43,14 @@ window.billReceiveComponent = Vue.extend({
 
             this.status = count;
         },
-        updateStatus: function () {
-            var self = this;
-
-            BillReceive.query().then(function (response) {
-                self.calculateStatus(response.data);
+        updateStatus() {
+            BillReceiveResource.query().then((response) => {
+                this.calculateStatus(response.data);
             });
         }
     },
     events: {
-        'change-info': function () {
+        'change-info'() {
             this.updateStatus();
         }
     }

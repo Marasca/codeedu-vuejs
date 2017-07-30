@@ -1,0 +1,2 @@
+class BillReceive extends Bill {
+}

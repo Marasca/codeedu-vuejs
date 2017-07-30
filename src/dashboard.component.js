@@ -14,15 +14,15 @@ window.dashboardComponent = Vue.extend({
                 <tbody>
                     <tr>
                         <th>Pagas</th>
-                        <td>{{ resume.pays.done | currency 'R$ ' 2 }}</td>
+                        <td>{{ resume.pays.done | numberFormat }}</td>
                     </tr>
                     <tr>
                         <th>A pagar</th>
-                        <td>{{ resume.pays.pending | currency 'R$ ' 2 }}</td>
+                        <td>{{ resume.pays.pending | numberFormat }}</td>
                     </tr>
                     <tr>
                         <th>Total</th>
-                        <td>{{ resume.pays.total | currency 'R$ ' 2 }}</td>
+                        <td>{{ resume.pays.total | numberFormat }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -34,15 +34,15 @@ window.dashboardComponent = Vue.extend({
                 <tbody>
                     <tr>
                         <th>Recebidas</th>
-                        <td>{{ resume.receives.done | currency 'R$ ' 2 }}</td>
+                        <td>{{ resume.receives.done | numberFormat }}</td>
                     </tr>
                     <tr>
                         <th>A receber</th>
-                        <td>{{ resume.receives.pending | currency 'R$ ' 2 }}</td>
+                        <td>{{ resume.receives.pending | numberFormat }}</td>
                     </tr>
                     <tr>
                         <th>Total</th>
-                        <td>{{ resume.receives.total | currency 'R$ ' 2 }}</td>
+                        <td>{{ resume.receives.total | numberFormat }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -54,18 +54,18 @@ window.dashboardComponent = Vue.extend({
                 <tbody>
                     <tr>
                         <th>Atual</th>
-                        <td>{{ resume.receives.done - resume.pays.done | currency 'R$ ' 2 }}</td>
+                        <td>{{ resume.receives.done - resume.pays.done | numberFormat }}</td>
                     </tr>
                     <tr>
                         <th>Projetado</th>
-                        <td>{{ resume.receives.total - resume.pays.total | currency 'R$ ' 2 }}</td>
+                        <td>{{ resume.receives.total - resume.pays.total | numberFormat }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
     `,
-    data: function () {
+    data() {
         return {
             title: "Início",
             resume: {
@@ -82,23 +82,19 @@ window.dashboardComponent = Vue.extend({
             }
         };
     },
-    created: function () {
+    created() {
         this.getPayBillsResume();
         this.getReceiveBillsResume();
     },
     methods: {
-        getPayBillsResume: function () {
-            var self = this;
-
-            Bill.resume().then(function (response) {
-                self.resume.pays = response.data.resume;
+        getPayBillsResume() {
+            BillPayResource.resume().then((response) => {
+                this.resume.pays = response.data.resume;
             });
         },
-        getReceiveBillsResume: function () {
-            var self = this;
-
-            BillReceive.resume().then(function (response) {
-                self.resume.receives = response.data.resume;
+        getReceiveBillsResume() {
+            BillReceiveResource.resume().then((response) => {
+                this.resume.receives = response.data.resume;
             });
         }
     }

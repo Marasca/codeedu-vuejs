@@ -1,3 +1,5 @@
+'use strict';
+
 Vue.config.devtools = true;
 
 var router = new VueRouter({

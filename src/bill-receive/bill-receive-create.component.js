@@ -1,20 +1,26 @@
+const RECEIVE_NAMES = [
+    'parc. do sistema do joão',
+    'venda smartphone',
+    'manutenção site da mariana'
+];
+
 window.billReceiveCreateComponent = Vue.extend({
     template: `
     <div class="well">
         <form name="edit-form" @submit.prevent="submit">
             <div class="form-group">
                 <label>Vencimento:</label>
-                <input type="text" class="form-control" v-model="bill.date_due">
+                <input type="text" class="form-control" v-model="bill.date_due | dateFormat 'pt-BR'">
             </div>
             <div class="form-group">
                 <label>Nome:</label>
                 <select class="form-control" v-model="bill.name">
-                    <option v-for="o in names" value="{{ o }}">{{ o }}</option>
+                    <option v-for="o in names" value="{{ o }}">{{ o | toUpper }}</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>Valor:</label>
-                <input type="text" class="form-control" v-model="bill.value">
+                <input type="text" class="form-control" v-model="bill.value | numberFormat">
             </div>
             <div class="form-group">
                 <label>Recebido?</label>
@@ -26,49 +32,38 @@ window.billReceiveCreateComponent = Vue.extend({
         </form>
     </div>
     `,
-    data: function () {
+    data() {
         return {
             formType: 'insert',
-            names: [
-                'Parc. do sistema do João',
-                'Venda smartphone',
-                'Manutenção site da Mariana'
-            ],
-            bill: {
-                date_due: '',
-                name: '',
-                value: 0,
-                done: false
-            }
+            names: RECEIVE_NAMES,
+            bill: new BillReceive()
         };
     },
-    created: function () {
+    created() {
         if (this.$route.name == 'bill-receive.update') {
             this.formType = 'update';
             this.getBill(this.$route.params.id);
         }
     },
     methods: {
-        submit: function () {
-            var self = this;
+        submit() {
+            let data = this.bill.toJSON();
 
             if (this.formType == 'insert') {
-                BillReceive.save({}, this.bill).then(function (response) {
-                    self.$dispatch('change-info');
-                    self.$router.go({name: 'bill-receive.list'});
+                BillReceiveResource.save({}, data).then((response) => {
+                    this.$dispatch('change-info');
+                    this.$router.go({name: 'bill-receive.list'});
                 });
             } else {
-                BillReceive.update({id: this.bill.id}, this.bill).then(function (response) {
-                    self.$dispatch('change-info');
-                    self.$router.go({name: 'bill-receive.list'});
+                BillReceiveResource.update({id: this.bill.id}, data).then((response) => {
+                    this.$dispatch('change-info');
+                    this.$router.go({name: 'bill-receive.list'});
                 });
             }
         },
-        getBill: function (id) {
-            var self = this;
-
-            BillReceive.get({id: id}).then(function (response) {
-                self.bill = response.data;
+        getBill(id) {
+            BillReceiveResource.get({id: id}).then((response) => {
+                this.bill = new BillReceive(response.data);
             });
         }
     }
